@@ -1,5 +1,9 @@
 import {useState} from "react";
 
+/*
+{ id: 1, description: "Passports", quantity: 2, packed: false },
+{ id: 2, description: "Socks", quantity: 12, packed: false },
+   */
 
 const App = () => {
     const [items, setItems] = useState([]);
@@ -13,12 +17,17 @@ const App = () => {
         const filteredItems = items.filter((item) => item.id !== id);
         setItems(filteredItems);
     };
+    const handleCheckedItem = (id) => {
+        setItems((items) => items.map((item) =>
+            item.id === id ? {...item, packed: !item.packed} : item
+        ));
+    };
 
     return (
         <div className="app">
             <Logo/>
             <Form onAddItem={handleAddItem} />
-            <PackingList items={items} onDeleteItem={handleDeleteItem} />
+            <PackingList items={items} onDeleteItem={handleDeleteItem} onCheckedItem={handleCheckedItem} />
             <Stats />
         </div>
     );
@@ -62,21 +71,23 @@ const Form = ({onAddItem}) => {
     );
 }
 
-const PackingList = ({items, onDeleteItem}) => {
+const PackingList = ({items, onDeleteItem, onCheckedItem}) => {
     return (
         <div className="list">
             <ul>
                 {
-                    items.map((item) => <Item key={item.id} item={item} onDeleteItem={onDeleteItem} />)
+                    items.map((item) => <Item key={item.id} item={item} onDeleteItem={onDeleteItem} onCheckedItem={onCheckedItem} />)
                 }
             </ul>
         </div>
     );
 }
 
-const Item = ({item, onDeleteItem}) => {
+const Item = ({item, onDeleteItem, onCheckedItem}) => {
+
     return (
         <li>
+            <input type="checkbox" value={item.packed} onChange={() => onCheckedItem(item.id)} />
             <span style={item.packed ? {textDecoration: "line-through"} : {}}>
                 {item.quantity} {item.description}
             </span>
